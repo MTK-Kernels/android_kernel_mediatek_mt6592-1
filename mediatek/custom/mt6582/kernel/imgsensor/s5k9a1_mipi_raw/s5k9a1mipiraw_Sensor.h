@@ -1,0 +1,187 @@
+/*******************************************************************************************/
+
+
+/******************************************************************************************/
+
+/* SENSOR FULL SIZE */
+#ifndef __SENSOR_H
+#define __SENSOR_H   
+
+typedef enum group_enum {
+    PRE_GAIN=0,
+    CMMCLK_CURRENT,
+    FRAME_RATE_LIMITATION,
+    REGISTER_EDITOR,
+    GROUP_TOTAL_NUMS
+} FACTORY_GROUP_ENUM;
+
+
+#define ENGINEER_START_ADDR 10
+#define FACTORY_START_ADDR 0
+
+typedef enum engineer_index
+{
+    CMMCLK_CURRENT_INDEX=ENGINEER_START_ADDR,
+    ENGINEER_END
+} FACTORY_ENGINEER_INDEX;
+
+typedef enum register_index
+{
+	SENSOR_BASEGAIN=FACTORY_START_ADDR,
+	PRE_GAIN_R_INDEX,
+	PRE_GAIN_Gr_INDEX,
+	PRE_GAIN_Gb_INDEX,
+	PRE_GAIN_B_INDEX,
+	FACTORY_END_ADDR
+} FACTORY_REGISTER_INDEX;
+
+typedef struct
+{
+    SENSOR_REG_STRUCT	Reg[ENGINEER_END];
+    SENSOR_REG_STRUCT	CCT[FACTORY_END_ADDR];
+} SENSOR_DATA_STRUCT, *PSENSOR_DATA_STRUCT;
+
+typedef enum {
+    SENSOR_MODE_INIT = 0,
+    SENSOR_MODE_PREVIEW,
+    SENSOR_MODE_VIDEO,
+    SENSOR_MODE_CAPTURE,
+} S5K9A1_SENSOR_MODE;
+
+
+typedef struct
+{
+	kal_uint32 DummyPixels;
+	kal_uint32 DummyLines;
+	
+	kal_uint32 pvShutter;
+	kal_uint32 pvGain;
+	
+	kal_uint32 pvPclk;  // x10 480 for 48MHZ
+	kal_uint32 videoPclk;
+	kal_uint32 capPclk; // x10
+	
+	kal_uint32 shutter;
+	kal_uint32 maxExposureLines;
+
+	kal_uint16 sensorGlobalGain;//sensor gain read from 0x350a 0x350b;
+	kal_uint16 ispBaseGain;//64
+	kal_uint16 realGain;//ispBaseGain as 1x
+
+	kal_int16 imgMirror;
+
+	S5K9A1_SENSOR_MODE sensorMode;
+
+	kal_bool S5K9A1AutoFlickerMode;
+	kal_bool S5K9A1VideoMode;
+	
+}S5K9A1_PARA_STRUCT,*PS5K9A1_PARA_STRUCT;
+
+
+    #define CURRENT_MAIN_SENSOR                S5K9A1_MICRON
+   //if define RAW10, MIPI_INTERFACE must be defined
+   //if MIPI_INTERFACE is marked, RAW10 must be marked too
+    #define MIPI_INTERFACE
+
+   #define S5K9A1_IMAGE_SENSOR_FULL_HACTIVE    1288
+   #define S5K9A1_IMAGE_SENSOR_FULL_VACTIVE    728
+   #define S5K9A1_IMAGE_SENSOR_PV_HACTIVE      1288
+   #define S5K9A1_IMAGE_SENSOR_PV_VACTIVE      728
+   #define S5K9A1_IMAGE_SENSOR_VIDEO_HACTIVE   1288
+   #define S5K9A1_IMAGE_SENSOR_VIDEO_VACTIVE   728
+
+
+   #define S5K9A1_IMAGE_SENSOR_FULL_WIDTH				(S5K9A1_IMAGE_SENSOR_FULL_HACTIVE)	
+   #define S5K9A1_IMAGE_SENSOR_FULL_HEIGHT 				(S5K9A1_IMAGE_SENSOR_FULL_VACTIVE)
+
+	/* SENSOR PV SIZE */
+
+   #define S5K9A1_IMAGE_SENSOR_PV_WIDTH        (S5K9A1_IMAGE_SENSOR_PV_HACTIVE)
+   #define S5K9A1_IMAGE_SENSOR_PV_HEIGHT       (S5K9A1_IMAGE_SENSOR_PV_VACTIVE)
+
+   #define S5K9A1_IMAGE_SENSOR_VIDEO_WIDTH     (S5K9A1_IMAGE_SENSOR_VIDEO_HACTIVE)
+   #define S5K9A1_IMAGE_SENSOR_VIDEO_HEIGHT    (S5K9A1_IMAGE_SENSOR_VIDEO_VACTIVE)
+
+
+	/* SENSOR SCALER FACTOR */
+	#define S5K9A1_PV_SCALER_FACTOR					    	3
+	#define S5K9A1_FULL_SCALER_FACTOR					    1
+	                                        	
+	/* SENSOR START/EDE POSITION */         	
+	#define S5K9A1_FULL_X_START						    		(0)
+	#define S5K9A1_FULL_Y_START						    		(0)
+	#define S5K9A1_PV_X_START						    		(0)
+	#define S5K9A1_PV_Y_START						    		(0)	
+	#define S5K9A1_VIDEO_X_START								(0)
+	#define S5K9A1_VIDEO_Y_START								(0)
+
+	#define S5K9A1_MAX_ANALOG_GAIN					(16)
+	#define S5K9A1_MIN_ANALOG_GAIN					(1)
+	#define S5K9A1_ANALOG_GAIN_1X						(0x0020)
+
+	/* SENSOR PIXEL/LINE NUMBERS IN ONE PERIOD */
+    #define	S5K9A1_IMAGE_SENSOR_FULL_HBLANKING  712
+    #define S5K9A1_IMAGE_SENSOR_FULL_VBLANKING  280
+
+
+    #define	S5K9A1_IMAGE_SENSOR_PV_HBLANKING    712
+    #define S5K9A1_IMAGE_SENSOR_PV_VBLANKING    280
+	
+    #define	S5K9A1_IMAGE_SENSOR_VIDEO_HBLANKING    712
+    #define S5K9A1_IMAGE_SENSOR_VIDEO_VBLANKING    280
+
+
+	#define S5K9A1_FULL_PERIOD_PIXEL_NUMS	    (S5K9A1_IMAGE_SENSOR_FULL_HACTIVE + S5K9A1_IMAGE_SENSOR_FULL_HBLANKING)  
+    #define S5K9A1_FULL_PERIOD_LINE_NUMS	    (S5K9A1_IMAGE_SENSOR_FULL_VACTIVE + S5K9A1_IMAGE_SENSOR_FULL_VBLANKING)  
+    #define S5K9A1_PV_PERIOD_PIXEL_NUMS	        (S5K9A1_IMAGE_SENSOR_PV_HACTIVE + S5K9A1_IMAGE_SENSOR_PV_HBLANKING)     
+    #define S5K9A1_PV_PERIOD_LINE_NUMS	        (S5K9A1_IMAGE_SENSOR_PV_VACTIVE + S5K9A1_IMAGE_SENSOR_PV_VBLANKING)    
+    #define S5K9A1_VIDEO_PERIOD_PIXEL_NUMS 		(S5K9A1_IMAGE_SENSOR_VIDEO_HACTIVE + S5K9A1_IMAGE_SENSOR_VIDEO_HBLANKING) 	
+    #define S5K9A1_VIDEO_PERIOD_LINE_NUMS		(S5K9A1_IMAGE_SENSOR_VIDEO_VACTIVE + S5K9A1_IMAGE_SENSOR_VIDEO_VBLANKING)    
+
+
+	/* DUMMY NEEDS TO BE INSERTED */
+	/* SETUP TIME NEED TO BE INSERTED */
+	#define S5K9A1_IMAGE_SENSOR_PV_INSERTED_PIXELS			2
+	#define S5K9A1_IMAGE_SENSOR_PV_INSERTED_LINES			2
+
+	#define S5K9A1_IMAGE_SENSOR_FULL_INSERTED_PIXELS		4
+	#define S5K9A1_IMAGE_SENSOR_FULL_INSERTED_LINES		    4
+
+#define S5K9A1MIPI_WRITE_ID 	(0x50)
+#define S5K9A1MIPI_READ_ID	(0x51)
+
+// SENSOR CHIP VERSION
+
+#define S5K9A1MIPI_SENSOR_ID            S5K9A1_SENSOR_ID
+
+#define S5K9A1MIPI_PAGE_SETTING_REG    (0xFF)
+
+struct S5K9A1_SENSOR_STRUCT
+{
+    kal_uint8 i2c_write_id;
+    kal_uint8 i2c_read_id;
+};
+
+
+//s_add for porting
+//s_add for porting
+//s_add for porting
+
+//export functions
+UINT32 S5K9A1MIPIOpen(void);
+UINT32 S5K9A1MIPIGetResolution(MSDK_SENSOR_RESOLUTION_INFO_STRUCT *pSensorResolution);
+UINT32 S5K9A1MIPIGetInfo(MSDK_SCENARIO_ID_ENUM ScenarioId, MSDK_SENSOR_INFO_STRUCT *pSensorInfo, MSDK_SENSOR_CONFIG_STRUCT *pSensorConfigData);
+UINT32 S5K9A1MIPIControl(MSDK_SCENARIO_ID_ENUM ScenarioId, MSDK_SENSOR_EXPOSURE_WINDOW_STRUCT *pImageWindow, MSDK_SENSOR_CONFIG_STRUCT *pSensorConfigData);
+UINT32 S5K9A1MIPIFeatureControl(MSDK_SENSOR_FEATURE_ENUM FeatureId, UINT8 *pFeaturePara,UINT32 *pFeatureParaLen);
+UINT32 S5K9A1MIPIClose(void);
+
+//#define Sleep(ms) mdelay(ms)
+//#define RETAILMSG(x,...)
+//#define TEXT
+
+//e_add for porting
+//e_add for porting
+//e_add for porting
+#endif /* __SENSOR_H */
+
+
